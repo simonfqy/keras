@@ -5,7 +5,7 @@ from PIL import *
 import random
 import sys
 import StringIO
-import leargist as lgist
+import gist
 from sklearn.decomposition import PCA
 
 #Build the database
@@ -86,7 +86,9 @@ def write_feature(db_path, converted_db_path, method='isohashlp', count,
         with converted_db.write_batch() as converted_wb:
             for key, value in db:                
                 img = Image.frombytes('RGB', (224, 224), value)
-                gist = lgist.color_gist(img)
+                img_data = np.asarray(img)
+
+                gist = gist.extract(img_data)
                 # The 960-dimensional gists, serving as inputs for isoHash.
                 # TODO: could have better implementation
                 gists[:, i] = gist
