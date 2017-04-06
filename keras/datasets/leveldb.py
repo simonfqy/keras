@@ -1,23 +1,45 @@
 import numpy as np
 import os
-import plyvel
-from PIL import Image, ImageOps
+import plyvel as ply
+from PIL import *
 import random
 import sys
+import StringIO
 
 #Build the database
-def build_db(train_file, label_file, db_path,img_size=(224,224,3)):
-    db = plyvel.DB(db_path, create_if_missing=True,, error_if_exists=True, write_buffer_size=268435456)
+#Build the database
+def build_db(rootpath,train_file, db_path,img_size=(224,224)):
+    db = ply.DB(db_path, create_if_missing=True, write_buffer_size=268435456)
     wb = db.write_batch()
 
+    count = 0
 
-    img = Image.open(root+imgfile, 'r')
+    with open(train_file) as f:
+        for fileName in f.read().splitlines():
+            print fileName
+            img = Image.open(rootpath+fileName, 'r')
+            img.thumbnail(img_size, Image.ANTIALIAS)
+            img = ImageOps.fit(img,img_size,Image.ANTIALIAS)
+            wb.put('%08d_%s' % (count, fileName), img.tobytes())
+            count = count + 1
+            if count % 1000 == 0:
+                wb.write()
+                del wb
+                wb = db.write_batch()
+                print 'Processed %i images.' % count
+
+    if count % 1000 == 0:
+        wb.write()
+        print "Processed a total of %i images." %count
+    else:
+        print "Processed a total of %i images." %count
+
 
 
 # Load the images from database:
-def load_db():
-    train_file = open()
+def load_db(db_path):
 
 # Write the features to database
 
-def write_feature(key):
+def write_feature(db_path):
+#write hash features as key to index the images
