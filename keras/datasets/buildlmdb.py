@@ -24,11 +24,16 @@ def build_db(db_path, rootpath, trainfile, imgsize=(224,224)):
                 str_id = '{:08}'.format(i)
                 tdb.put(str_id.encode('ascii'), img.tobytes())
 
+def load_db(db_path,imgsize=(224,224)):
+    env = lmdb.open(db_path, readonly=True)
+    imglist=[]
+    with env.begin() as tdb:
+        cursor = tdb.cursor()
+        for key, value in cursor:
+            imgitem = value
+            img = Image.frombytes('RGB',imgsize,imgitem)
+            imglist.append(img)
 
-
-
-
-def load_db(db_path):
 
 # Write the deep convolutional features of images
 # to database
