@@ -11,15 +11,16 @@ import sys
 #
 def build_db(db_path, rootpath, trainfile, imgsize=(224,224)):
 
-    env = lmdb.open(dbpath, map_size=2684354560)
-
+    env = lmdb.open(db_path, map_size=2684354560)
+    i = 0
     with env.begin(write=True) as tdb:
         with open(train_file) as f:
             for fileName in f.read().splitlines():
                 print fileName
+                i = i + 1
                 img = Image.open(rootpath+fileName, 'r')
-                img.thumbnail(img_size, Image.ANTIALIAS)
-                img = ImageOps.fit(img,img_size,Image.ANTIALIAS)
+                img.thumbnail(imgsize, Image.ANTIALIAS)
+                img = ImageOps.fit(img,imgsize,Image.ANTIALIAS)
                 str_id = '{:08}'.format(i)
                 tdb.put(str_id.encode('ascii'), img.tobytes())
 
