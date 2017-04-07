@@ -109,10 +109,12 @@ def write_feature(db_path, converted_db_path, method='isohashlp', count,
             # TODO: Use sign function to get Y.
             Y = (Q.T).dot(gist_reduced)
             Y = (Y >= 0)*1
-
-            for i in range(count):
+            
+            i = 0
+            for key, value in db:
                 converted_key = Y[:, i].tobytes()
                 converted_wb.put(converted_key, value)
+                i += 1
                 # Note that if want to reconstruct from string, must use
                 # np.fromstring(converted_key, dtype = int)
 
